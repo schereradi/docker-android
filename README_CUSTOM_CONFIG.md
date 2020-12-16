@@ -63,6 +63,17 @@ If you want to add more arguments for running emulator, you can ***pass an envir
 docker run --privileged -d -p 6080:6080 -p 4723:4723 -p 5554:5554 -p 5555:5555 -e DEVICE="Samsung Galaxy S6" -e EMULATOR_ARGS="-no-snapshot-load -partition-size 512" --name android-container budtmo/docker-android-x86-8.1
 ```
 
+Add entries to emulator hosts file
+-------------------------
+
+You can add other hosts into the emulator's `/etc/hosts` file by using the `ADD_HOSTS` flag. The following example adds two host to IP mapping within the emulator. This flag can be usefull when you need to connect from the emulator to an external host.
+
+```bash
+docker run --privileged -d -p 6080:6080 -p 4723:4723 -p 5554:5554 -p 5555:5555 -e DEVICE="Samsung Galaxy S6" -e ADD_HOSTS="10.0.2.2:foo.com,10.0.2.3:bar.com" --name android-container budtmo/docker-android-x86-8.1
+```
+
+Currently the `ADD_HOSTS` flag works only on Android API level 28 or lower.
+
 Appium Test Distribution (ATD)
 ------------------------------
 

@@ -5,6 +5,7 @@ import logging
 import os
 import subprocess
 import uuid
+import time
 
 from src import CHROME_DRIVER, CONFIG_FILE, ROOT
 from src import log
@@ -119,6 +120,22 @@ def prepare_avd(device: str, avd_name: str, dp_size: str):
 
     logger.info('Skin was added in config.ini')
 
+def add_hosts():
+    time.sleep(8)
+    hosts_args=os.getenv('ADD_HOSTS', '')
+    logger.info('Hosts Args: {hosts_args}'.format(hosts_args=hosts_args))
+
+    subprocess.check_call('platform-tools/adb root', shell=True)
+    subprocess.check_call('platform-tools/adb remount', shell=True)
+    subprocess.check_call('platform-tools/adb pull /etc/hosts', shell=True)
+
+    hosts = hosts_args.split(",") if hosts_args else []
+    for host in hosts:
+        cmd = 'echo {host} >> hosts'.format(host=host.replace(':',' '))
+        subprocess.check_call(cmd, shell=True)
+
+    subprocess.check_call('platform-tools/adb push hosts /etc/hosts', shell=True)
+
 
 def appium_run(avd_name: str):
     """
@@ -231,6 +248,7 @@ def run():
     appium = convert_str_to_bool(str(os.getenv('APPIUM', False)))
     if appium:
         subprocess.Popen(cmd.split())
+        add_hosts()
         logger.info('Run appium server...')
         appium_run(avd_name)
     else:
